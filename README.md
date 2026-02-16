@@ -67,12 +67,12 @@ pnpm dev
 
 | | **`db:push`** | **`db:generate` + `db:migrate`** |
 |---|---|---|
-| **O que faz** | Compara o schema do código com o banco e aplica as mudanças direto | Gera arquivos SQL de migração e depois aplica no banco |
-| **Arquivos** | Não cria/usa arquivos `.sql` | Gera arquivos em `drizzle/*.sql` |
-| **Histórico** | Sem histórico versionado | Histórico de migrações versionado |
-| **Quando usar** | Desenvolvimento rápido, prototipagem | Produção, CI/CD, times grandes |
+| **What it does** | Compares code schema with DB and applies changes directly | Generates SQL migration files and then applies them to DB |
+| **Files** | Doesn't create/use `.sql` files | Generates files in `drizzle/*.sql` |
+| **History** | No versioned history | Versioned migration history |
+| **When to use** | Fast development, prototyping | Production, CI/CD, large teams |
 
-Use `pnpm db:push` para dev. Para produção, prefira `pnpm db:generate` (gera os `.sql`) e `pnpm db:migrate` (aplica no banco).
+Use `pnpm db:push` for dev. For production, prefer `pnpm db:generate` (generates `.sql` files) and `pnpm db:migrate` (applies to DB).
 
 ---
 
@@ -99,42 +99,42 @@ Server runs at `http://localhost:8000`.
 
 ### Token (JWT)
 
-O login retorna um JWT assinado com `JWT_SECRET`, com validade de 7 dias. O token pode ser enviado de duas formas:
+Login returns a JWT signed with `JWT_SECRET`, valid for 7 days. The token can be sent in two ways:
 
 - **Header**: `Authorization: Bearer <token>`
-- **Cookie**: `auth-token` (HttpOnly, definido automaticamente no login)
+- **Cookie**: `auth-token` (HttpOnly, set automatically on login)
 
-O payload do JWT contém apenas o `sub` (subject). Não armazene dados sensíveis no token.
+The JWT payload contains only the `sub` (subject). Do not store sensitive data in the token.
 
 ### Password digest
 
-Senhas nunca são armazenadas em texto puro. Na criação/atualização de usuário:
+Passwords are never stored in plain text. On user creation/update:
 
-- A senha em plain text é hasheada com **bcrypt** (10 rounds)
-- Apenas o hash é persistido na coluna `password` da tabela `users`
+- The plain text password is hashed with **bcrypt** (10 rounds)
+- Only the hash is persisted in the `password` column of the `users` table
 
-No login, `bcrypt.compare()` verifica se a senha informada corresponde ao hash. Opcionalmente, `MASTER_PASSWORD` no `.env` permite bypass em ambiente de desenvolvimento.
+On login, `bcrypt.compare()` verifies if the provided password matches the hash. Optionally, `MASTER_PASSWORD` in `.env` allows bypass in development environment.
 
 ### sub (subject)
 
-O `sub` é um identificador único do usuário (UUID, gerado no signup). Ele:
+The `sub` is a unique user identifier (UUID, generated on signup). It:
 
-- É guardado na tabela `users` e incluído no payload do JWT
-- Identifica o usuário sem expor email ou outros dados no token
-- É usado para buscar o usuário no banco quando o token é validado (`UserService.getUserBySub`)
+- Is stored in the `users` table and included in the JWT payload
+- Identifies the user without exposing email or other data in the token
+- Is used to fetch the user from the DB when the token is validated (`UserService.getUserBySub`)
 
-Fluxo: token válido → extrai `sub` → busca user no DB → usuário completo disponível no context.
+Flow: valid token → extract `sub` → fetch user from DB → complete user available in context.
 
 ### GraphQL Context
 
-O context é criado **a cada requisição** em `src/context.ts`:
+The context is created **on each request** in `src/context.ts`:
 
-1. Lê o token do header `Authorization` ou do cookie `auth-token`
-2. Valida o token e extrai o `sub`
-3. Busca o usuário no banco pelo `sub`
-4. Retorna `{ user, res }` — `user` é `null` se não houver token válido
+1. Reads the token from the `Authorization` header or `auth-token` cookie
+2. Validates the token and extracts the `sub`
+3. Fetches the user from the DB by `sub`
+4. Returns `{ user, res }` — `user` is `null` if there's no valid token
 
-Nos resolvers, use `context.user` para checar autenticação. A diretiva `@auth(role: "admin")` protege campos que exigem login e/ou role específica.
+In resolvers, use `context.user` to check authentication. The `@auth(role: "admin")` directive protects fields that require login and/or a specific role.
 
 ---
 
