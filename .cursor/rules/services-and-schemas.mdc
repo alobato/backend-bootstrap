@@ -1,0 +1,35 @@
+---
+description: Patterns for Services (Drizzle) and Zod Schemas
+globs: src/services/**/*.ts, src/db/schema.ts
+alwaysApply: false
+---
+
+# Services and Schemas
+
+## Services
+
+- A service is an exported **object** with async methods (e.g. `export const AuthorService = { ... }`).
+- Naming: `{Entity}Service` (e.g. `AuthorService`, `BookService`).
+- Imports: `db` from `../db/index.js`, tables from `../db/schema.js`, schema types from `./schemas.js`.
+- Methods receive input typed with `z.infer<typeof XSchema>`; never use `any` for input.
+- For get by ID: method `getXById(id: number)` and/or `getX(input: z.infer<typeof GetXSchema>)` that delegates.
+- For create/update: use `CreateXSchema` / `UpdateXSchema`. On update, check existence and `throw new Error("... not found")` if missing; build update object only with defined fields (`!== undefined`).
+- Timestamps: use `new Date().toISOString()` for `createdAt`/`updatedAt` on insert/update.
+- Returns: `return result` or `return null` for single get; array for list/search. Use `.returning()` on insert/update when you need the created/updated row.
+
+## Schemas (Zod)
+
+- Centralize in `src/services/schemas.ts`.
+- Every field must have `.describe("...")` in **English**, explaining its purpose.
+- Naming patterns: `CreateXSchema`, `UpdateXSchema`, `GetXSchema` (e.g. `authorId: z.number().describe("...")`), `SearchXSchema` (e.g. `query: z.string().describe("...")`).
+- IDs from the request: include in the describe that they "MUST be extracted from the user request".
+- Create: required fields without `.optional()`. Update: all optional.
+- Export all schemas for use in services and REST routes.
+
+## Drizzle Schema (`src/db/schema.ts`)
+
+- Tables with `pgTable`; columns with camelCase in code and snake_case in DB when different (e.g. `firstName: varchar("first_name", ...)`).
+- Timestamps: `timestamp("created_at", { withTimezone: true, mode: "string" }).notNull()` and same for `updated_at`.
+- Define `relations`, `foreignKey`, and `index` where appropriate. Export types: `export type X = typeof table.$inferSelect`, `export type NewX = typeof table.$inferInsert`.
+
+For full examples, see `AuthorService`, `BookService`, and `src/services/schemas.ts`.

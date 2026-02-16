@@ -1,0 +1,32 @@
+---
+description: Patterns for REST routes (Express) and validation
+globs: src/routes/**/*.ts
+alwaysApply: false
+---
+
+# REST Routes
+
+## Structure
+
+- Handlers are exported **named functions** (e.g. `getAuthors`, `getAuthorById`, `createAuthor`). They receive `(req: Request, res: Response)`.
+- Validation with **Zod**: use `XSchema.safeParse(...)`. For params: `GetXSchema.safeParse({ xId: Number(req.params.id) })`. For body: `CreateXSchema.safeParse(req.body)`. For query: `SearchXSchema.safeParse({ query: typeof req.query.q === "string" ? req.query.q : "" })`.
+- If `!parsed.success`: `return res.status(400).json({ error: "Short message", details: parsed.error.flatten() })`. Keep error messages in **English**.
+- Call the **Service** with `parsed.data`; use `.then(...).catch(...)` to send the response.
+
+## HTTP Status
+
+- **200**: GET/PATCH success (and body with resource).
+- **201**: POST success (and body with created resource).
+- **400**: validation failed (safeParse).
+- **404**: resource not found (e.g. author does not exist). Handle in `.catch`: if `err.message.includes("not found")` then `res.status(404).json({ error: err.message })`.
+- **500**: internal error; `res.status(500).json({ error: err.message })`.
+
+## v1 Routes
+
+- Routes in `src/routes/v1/`: one file per resource (e.g. `authors.ts`, `books.ts`). In `v1/index.ts`, import as namespace (`import * as authors from "./authors.js"`) and register on the router: `router.get("/authors", authors.getAuthors)`, `router.get("/authors/:id", authors.getAuthorById)`, `router.post("/authors", authors.createAuthor)`, `router.patch("/authors/:id", authors.updateAuthor)`, and search at `GET /authors/search` with query `q`.
+
+## Naming
+
+- List: `getX` or `getXs`. By ID: `getXById`. Search: `searchXs`. Create: `createX`. Update: `updateX`. Sub-resources: e.g. `getBookAuthors`, `addAuthorsToBook`, `removeAuthorsFromBook`.
+
+Reference: `src/routes/v1/authors.ts`, `src/routes/v1/index.ts`.

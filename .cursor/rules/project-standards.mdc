@@ -1,0 +1,13 @@
+---
+description: General backend project standards (TypeScript, ESM, style)
+alwaysApply: true
+---
+
+# Project Standards
+
+- **Language**: All textual parts of the code must be in **English**, including comments, error messages, log strings, API response messages, and documentation in the codebase.
+- **TypeScript**: Strict mode. Use explicit types for parameters and return values when not obvious.
+- **ESM**: The project uses ES modules (`"type": "module"`). Always use the **`.js`** extension in imports (e.g. `from "./services/schemas.js"`), even in `.ts` files.
+- **Style** (follow `.editorconfig`): 2-space indentation, LF line endings, UTF-8, trim trailing whitespace, insert final newline.
+- **Structure**: Business logic in **services** (`src/services/`), validation in **Zod schemas** (`src/services/schemas.ts`), persistence in **Drizzle** (`src/db/schema.ts`). GraphQL in `src/graphql/`, REST in `src/routes/`.
+- **Imports**: Prefer relative paths with `.js`. Group: external packages first, then `../db`, `../services`, etc.

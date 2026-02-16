@@ -1,0 +1,32 @@
+---
+description: Patterns for GraphQL typeDefs and resolvers (Apollo)
+globs: src/graphql/**/*.ts
+alwaysApply: false
+---
+
+# GraphQL (Apollo)
+
+## typeDefs
+
+- Use `gql` from `graphql-tag`. One file per entity (e.g. `Author.ts`, `Book.ts`) exporting `typeDefs` and `resolvers`.
+- Types: `type X { id: ID! ... }`. Optional fields without `!`, required with `!`.
+- Queries/Mutations: use **`extend type Query`** and **`extend type Mutation`** (do not define root `type Query` in the same file as the entity; common definitions live in `common.ts`).
+- Inputs: `input CreateXInput { ... }`, `input UpdateXInput { ... }`. IDs in mutations as `id: ID!` or `bookId: ID!`.
+- IDs in GraphQL are always **String**; in the resolver convert with `parseInt(id, 10)` when calling the service.
+
+## Resolvers
+
+- Export a `resolvers` object with keys `Query`, `Mutation`, and if there are nested fields, `X` (type name).
+- Query/Mutation resolvers: delegate to the **Service** (e.g. `AuthorService.getAllAuthors()`, `AuthorService.getAuthorById(parseInt(id, 10))`). Do not put business logic in the resolver.
+- Type args when useful: `args: { input: Parameters<typeof XService.createX>[0] }` or `{ id: string; input: ... }`.
+- Type resolvers (e.g. `Book.publisher`, `Book.authors`): receive `parent` with already-loaded fields; use `db` and schema tables to fetch relations (e.g. `eq(publishers.id, parent.publisherId)`).
+
+## Registration
+
+- In `src/graphql/resolvers/index.ts`: import each module as a namespace (`import * as Author from "./Author.js"`) and add to the `resolvers` array; export `definitions` so the schema can use each module's `typeDefs` and `resolvers`.
+
+## Authentication
+
+- Use the `@auth(role: String)` directive on fields that require authentication. Context has `user` and `res` (Express response); check `context.user` when needed.
+
+Reference: `src/graphql/resolvers/Author.ts`, `src/graphql/resolvers/Book.ts`, `src/graphql/resolvers/common.ts`.
