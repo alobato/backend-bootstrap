@@ -1,0 +1,175 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+directive @auth(role: String) on FIELD_DEFINITION
+
+type Author {
+  biography: String
+  birthDate: String
+  createdAt: String!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  nationality: String
+  updatedAt: String!
+}
+
+type Book {
+  authors: [Author!]!
+  categories: [Category!]!
+  createdAt: String!
+  description: String
+  id: ID!
+  isbn: String
+  language: String
+  pageCount: Int
+  price: String
+  publicationDate: String
+  publisher: Publisher
+  publisherId: Int
+  title: String!
+  updatedAt: String!
+}
+
+type BookAuthorResult {
+  addedCount: Int
+  message: String!
+  removedCount: Int
+  success: Boolean!
+}
+
+type Category {
+  createdAt: String!
+  description: String
+  id: ID!
+  name: String!
+  updatedAt: String!
+}
+
+input CreateAuthorInput {
+  biography: String
+  birthDate: String
+  firstName: String!
+  lastName: String!
+  nationality: String
+}
+
+input CreateBookInput {
+  authorIds: [Int!]
+  categoryIds: [Int!]
+  description: String
+  isbn: String
+  language: String
+  pageCount: Int
+  price: String
+  publicationDate: String
+  publisherId: Int
+  title: String!
+}
+
+input CreateCategoryInput {
+  description: String
+  name: String!
+}
+
+input CreatePublisherInput {
+  address: String
+  city: String
+  country: String
+  name: String!
+  website: String
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Mutation {
+  addAuthorsToBook(authorIds: [Int!]!, bookId: ID!): BookAuthorResult!
+  addCategoriesToBook(bookId: ID!, categoryIds: [Int!]!): BookAuthorResult!
+  createAuthor(input: CreateAuthorInput!): Author!
+  createBook(input: CreateBookInput!): Book!
+  createCategory(input: CreateCategoryInput!): Category!
+  createPublisher(input: CreatePublisherInput!): Publisher!
+  login(email: String!, password: String!): User!
+  logout: Boolean!
+  ping: Boolean!
+  removeAuthorsFromBook(authorIds: [Int!]!, bookId: ID!): BookAuthorResult!
+  removeCategoriesFromBook(bookId: ID!, categoryIds: [Int!]!): BookAuthorResult!
+  updateAuthor(id: ID!, input: UpdateAuthorInput!): Author!
+  updateBook(id: ID!, input: UpdateBookInput!): Book!
+  updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
+  updatePublisher(id: ID!, input: UpdatePublisherInput!): Publisher!
+}
+
+type Publisher {
+  address: String
+  city: String
+  country: String
+  createdAt: String!
+  id: ID!
+  name: String!
+  updatedAt: String!
+  website: String
+}
+
+type Query {
+  author(id: ID!): Author
+  authors: [Author!]!
+  book(id: ID!): Book
+  books: [Book!]!
+  categories: [Category!]!
+  category(id: ID!): Category
+  me: User
+  ping: Boolean!
+  publisher(id: ID!): Publisher
+  publishers: [Publisher!]!
+  searchAuthors(query: String!): [Author!]!
+  searchBooks(query: String!): [Book!]!
+  searchCategories(query: String!): [Category!]!
+  searchPublishers(query: String!): [Publisher!]!
+}
+
+input UpdateAuthorInput {
+  biography: String
+  birthDate: String
+  firstName: String
+  lastName: String
+  nationality: String
+}
+
+input UpdateBookInput {
+  authorIds: [Int!]
+  categoryIds: [Int!]
+  description: String
+  isbn: String
+  language: String
+  pageCount: Int
+  price: String
+  publicationDate: String
+  publisherId: Int
+  title: String
+}
+
+input UpdateCategoryInput {
+  description: String
+  name: String
+}
+
+input UpdatePublisherInput {
+  address: String
+  city: String
+  country: String
+  name: String
+  website: String
+}
+
+type User {
+  email: String!
+  id: ID!
+  name: String!
+  role: String!
+}

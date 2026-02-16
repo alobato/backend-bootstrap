@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Backend (Node.js)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/backend/src/index.ts",
+      "cwd": "${workspaceFolder}/apps/backend",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "restart": true,
+      "runtimeExecutable": "${workspaceFolder}/apps/backend/node_modules/.bin/tsx",
+      "runtimeArgs": ["--watch"]
+    }
+  ]
+}

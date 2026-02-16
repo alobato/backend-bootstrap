@@ -1,0 +1,32 @@
+{
+  "search.exclude": {
+    "pnpm-lock.yaml": true,
+    "node_modules": true
+  },
+  "files.exclude": {
+    "node_modules": true,
+    "**/node_modules": true,
+    ".git": true,
+    ".turbo": true,
+    "**/.turbo": true,
+    "dist": true,
+    "build": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
+  }
+}
